@@ -1,101 +1,77 @@
 const Rol = require("../models/rol.model");
 const response = require("../res/response");
 
-const getAll = async(req, res, next)=>{
-    try {    
+// Obtener todos los roles
+const getAll = async (req, res) => {
+    try {
         const roles = await Rol.findAll();
-        let data = "";
-        if (roles.length>0) {
-            data = {
-                total_registros: roles.length,
-                registros: roles
-            }
+        if (roles.length > 0) {
+            response.success(res, roles, 200);
         } else {
-            data = {
-                message: "no hay registros en la tabla"
-            }
-        } 
-        response.success(req,res,data,200);
-    } catch (error) {
-        next(error)
-    }
-};
-
-const getOne = async (req,res,next)=>{
-    try {
-        const id = req.params.id;
-        const rol = await Rol.findOne({where:{id}})
-        let data = "";
-        if (rol) {
-            data = {
-                registro: rol
-            }
-        } else {
-            data = {
-                message: "no hay registro con ese id"
-            }
-        } 
-        response.success(req,res,data,200);
-    } catch (error) {
-        next(error)
-    }
-};
-
-const create = async(req,res,next)=>{
-    try {
-        const data = req.body;
-        await Rol.sync();
-        const createdRol = await Rol.create(data);
-        let message;
-        if (createdRol.id) {
-            message = {
-                msg: "registro efectuado exitosamente",
-                regId: createdRol.id
-            }
-        } else {
-            message = {
-                msg: "error, usuario no creado"
-            }
+            response.success(res, { message: "No hay registros en la tabla" }, 200);
         }
-        response.success(req,res,message,201);
     } catch (error) {
-        next(error);
+        response.error(res, "Error al obtener roles", 500, error);
     }
 };
 
-const update = async(req,res,next)=>{
+// Obtener un solo rol por ID
+const getOne = async (req, res) => {
     try {
-        const data = req.body;
-        const id = req.params.id
-        const updatedRol = await Rol.update(data,{ where: {id}});
-        message = {
-            msg: "registro actualizado exitosamente",
-            regId: id
+        const { id } = req.params;
+        const rol = await Rol.findByPk(id);
+        if (!rol) {
+            return response.error(res, "Rol no encontrado", 404);
         }
-        response.success(req,res,message,200);
+        response.success(res, rol, 200);
     } catch (error) {
-        next(error);
+        response.error(res, "Error al obtener el rol", 500, error);
     }
 };
 
-const deleted = async (req,res,next)=>{
+// Crear un nuevo rol
+const create = async (req, res) => {
     try {
-        const id = req.params.id;
-        const deleteRol = await Rol.destroy({where:{id}})
-        let message = {
-            msg: "Registro eliminado exitosamente",
-            regId: id
+        const { name } = req.body;
+        if (!name) {
+            return response.error(res, "El nombre del rol es obligatorio", 400);
         }
-        response.success(req,res,message,200);
+        const newRol = await Rol.create({ name });
+        response.success(res, newRol, 201);
     } catch (error) {
-        next(error)
+        response.error(res, "Error al crear el rol", 500, error);
     }
 };
 
-module.exports = {
-    getAll,
-    getOne,
-    create,
-    update,
-    deleted
-}
+// Actualizar un rol existente
+const update = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        const rol = await Rol.findByPk(id);
+        if (!rol) {
+            return response.error(res, "Rol no encontrado", 404);
+        }
+        await rol.update({ name });
+        response.success(res, { message: "Rol actualizado correctamente" }, 200);
+    } catch (error) {
+        response.error(res, "Error al actualizar el rol", 500, error);
+    }
+};
+
+// Eliminar un rol
+const deleted = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const rol = await Rol.findByPk(id);
+        if (!rol) {
+            return response.error(res, "Rol no encontrado", 404);
+        }
+        await rol.destroy();
+        response.success(res, { message: "Rol eliminado correctamente" }, 200);
+    } catch (error) {
+        response.error(res, "Error al eliminar el rol", 500, error);
+    }
+};
+
+module.exports = { getAll, getOne, create, update, deleted };
