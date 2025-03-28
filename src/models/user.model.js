@@ -37,7 +37,7 @@ const User = sequelize.define(
             allowNull: false,
             unique: true,
             validate: {
-                isEmail: true, // Corrección aquí
+                isEmail: true, 
                 notNull: { msg: "El correo electronico es obligatorio" }
             }
         },

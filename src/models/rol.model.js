@@ -23,7 +23,6 @@ const Rol = sequelize.define(
     }
 );
 
-// Definir relaciones correctamente
 Rol.hasMany(User, {
     foreignKey: "rol_id"
 });

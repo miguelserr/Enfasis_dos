@@ -1,4 +1,4 @@
-const {Sequelize} = require("sequelize");
+const { Sequelize } = require("sequelize");
 const config = require("../config");
 
 const sequelize = new Sequelize(
@@ -8,19 +8,20 @@ const sequelize = new Sequelize(
     {
         host: config.mysql.host,
         dialect: "mysql",
-        port: config.mysql.port
+        port: config.mysql.port,
+        logging: false, 
     }
-)
+);
 
-async function testConection(){
+async function testConnection() {
     try {
         await sequelize.authenticate();
-        console.log("all good");
+        console.log("Conexión a la base de datos establecida correctamente.");
     } catch (error) {
-        console.log("all bad");
+        console.error(" Error al conectar con la base de datos:", error.message);
     }
 }
 
-testConection();
+testConnection();
 
-module.exports= sequelize;
+module.exports = sequelize;
