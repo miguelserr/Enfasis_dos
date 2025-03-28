@@ -1,27 +1,22 @@
-const express =  require("express");
+const express = require("express");
 const cors = require("cors");
 
-const config = require("../config");
+const config = require("../config"); 
+const roles = require("../routes/rol.routes");
+const authRoutes = require("../routes/auth.routes"); // Importar rutas de autenticación
 
 const app = express();
 
-const roles = require("../routes/rol.routes");
-
-//middlewares de configuracion
+// Middlewares
 app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 
-//config
-app.set('port',config.app.port);//middlewares de configuracion
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
+// Configuración del puerto
+app.set("port", config.app.port);
 
-//config
-app.set('port',config.app.port);
-
-//Rutas
+// Rutas
 app.use("/api/rol", roles);
+app.use("/api/auth", authRoutes); // Agregamos las rutas de autenticación
 
 module.exports = app;
